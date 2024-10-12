@@ -12,12 +12,10 @@ const registerUser = asyncHandler(async (req, res) => {
   const userExists = await User.findOne({ email });
 
   if (userExists) {
-    res.status(400);
-    throw new Error("User already exists");
+    res.status(400).send({ message: "User already exists" });
   }
 
-  const salt = await bcrypt.genSalt(10);
-  const hashedPassword = await bcrypt.hash(password, salt);
+  const hashedPassword = await bcrypt.hash(password, 10);
 
   const user = await User.create({
     user_id: Date.now(),
@@ -28,7 +26,7 @@ const registerUser = asyncHandler(async (req, res) => {
   });
 
   if (user) {
-    res.status(201).json({
+    res.status(201).send({
       _id: user._id,
       user_id: user.user_id,
       first_name: user.first_name,
@@ -37,8 +35,7 @@ const registerUser = asyncHandler(async (req, res) => {
       token: generateToken(user._id),
     });
   } else {
-    res.status(400);
-    throw new Error("Invalid user data");
+    res.status(400).send({ message: "Invalid user data" });
   }
 });
 
@@ -57,8 +54,7 @@ const loginUser = asyncHandler(async (req, res) => {
       token: generateToken(user._id),
     });
   } else {
-    res.status(401);
-    throw new Error("Invalid email or password");
+    res.status(401).send({ message: "Invalid email or password" });
   }
 });
 
